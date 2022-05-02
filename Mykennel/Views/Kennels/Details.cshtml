@@ -1,0 +1,131 @@
+﻿@model Mykennel.Models.Kennel
+
+@{
+    ViewData["Title"] = Model.KennelName;
+}
+
+<section class="jumbotron text-center bg-white">
+    <div class="container">
+        @{
+            if (Model.Logo != null)
+            {
+                <div class="p-5">
+                    <img src="@Model.Logo" style="max-height:200px;" alt="@Model.KennelName logo">
+                </div>
+            }
+        }
+        <h1 class="jumbotron-heading">@Model.KennelName</h1>
+        @{
+            if (Model.Description != null)
+            {
+                <h4>About us</h4>
+                <p class="lead text-muted">@Model.Description</p>
+            }
+        }
+    </div>
+</section>
+
+<div class="container py-5 bg-dark text-light text-center rounded">
+    <div class="row">
+        <div class="col-md-6 col-xl-4">
+            <h4>We are located at:</h4>
+            <p>
+                @Html.DisplayNameFor(model => model.Country): <strong>@Model.Country.CountryName</strong><br>
+                @Html.DisplayNameFor(model => model.PostalCode): <strong>@Model.PostalCode</strong><br>
+                @Html.DisplayNameFor(model => model.City): <strong>@Model.City</strong><br>
+                @Html.DisplayNameFor(model => model.Address): <strong>@Model.Address</strong>
+            </p>
+        </div>
+        <div class="col-md-6 col-xl-4">
+            <h4>Contacts:</h4>
+            @{ if (Model.ContactPerson != null)
+                { <span>@Html.DisplayNameFor(model => model.ContactPerson): <strong>@Model.ContactPerson</strong></span><br> }
+            }
+            @{ if (Model.ApplicationUser.PhoneNumber != null)
+                { <span>@Html.DisplayNameFor(model => model.ApplicationUser.PhoneNumber): <strong>@Model.ApplicationUser.PhoneNumber</strong></span><br> }
+            }
+            @Html.DisplayNameFor(model => model.ApplicationUser.Email): <strong>@Model.ApplicationUser.Email</strong></p>
+        </div>
+        @if (ViewBag.KennelBreeds != null)
+        {
+            <div class="col-md-6 col-xl-4">
+                <h4>Our Breeds:</h4>
+                <ul>
+                    @foreach (Breed breed in ViewBag.KennelBreeds)
+                    {
+                        <li><strong>@breed.Name</strong> (@breed.OriginalName) </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+@{
+    if (Model.Dogs.Count() != 0)
+    {
+        <div class="container py-5">
+            <h3>Our dogs:</h3>
+            <div class="row">
+                @foreach (Dog dog in Model.Dogs)
+                {
+                    if ((int)dog.Status == 1 || (int)dog.Status == 2)
+                    {
+                        <div class="col-md-4 col-xl-3">
+                            <div class="card m-3">
+                                <a asp-controller="Dogs" asp-action="Details" asp-route-id="@dog.DogId">
+                                    @{ if (dog.DogImage != null)
+                                        {<img src="@dog.DogImage" class="card-img-top cover-200" alt="@dog.Name image">}
+                                        else
+                                        {<img src="/images/no-image.jpg" class="card-img-top cover-200" alt="">}
+                                    }
+
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        @dog.Name
+                                        @{ if ((int)dog.Sex == 1)
+                                            {<i class="bi bi-gender-male"></i>}
+                                            else
+                                            {<i class="bi bi-gender-female"></i>}
+                                        }
+                                    </h5>
+                                    <p class="card-text"><strong>@dog.TitlesGenetics</strong></p>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <a asp-controller="Dogs" asp-action="Details" asp-route-id="@dog.DogId" class="btn btn-outline-dark">More</a>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <p>@dog.Status</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+}
+
+@{
+    if (Model.Litters.Count() != 0)
+    {
+        <div class="container py-5">
+            <h3>Our Litters:</h3>
+            <div class="row">
+                @foreach (Litter litter in Model.Litters)
+                {
+                    <div class="col-sm-3 m-3">
+                        <a asp-controller="Litters" asp-action="Details" asp-route-id="@litter.LitterId" class="btn btn-dark">
+                            <h1>@litter.Name</h1>
+                            <p>@litter.Date.Year. @litter.Date.Month. @litter.Date.Day.</p>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+

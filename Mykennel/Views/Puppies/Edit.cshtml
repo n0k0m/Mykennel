@@ -1,0 +1,63 @@
+﻿@model Mykennel.Models.Puppy
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Puppy</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PuppyId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Sex" class="control-label"></label>
+                <select asp-for="Sex" asp-items="Html.GetEnumSelectList<Sex>()" class="form-control"></select>
+                <span asp-validation-for="Sex" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Bookable" /> @Html.DisplayNameFor(model => model.Bookable)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Aim" class="control-label"></label>
+                <select asp-for="Aim" asp-items="Html.GetEnumSelectList<Aim>()" class="form-control"></select>
+                <span asp-validation-for="Aim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DogId" class="control-label"></label>
+                <select asp-for="DogId" class="form-control" asp-items="ViewBag.DogId">
+                    <option selected value=""></option>
+                </select>
+                <span asp-validation-for="DogId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LitterId" class="control-label"></label>
+                <select asp-for="LitterId" class="form-control" asp-items="ViewBag.LitterId"></select>
+                <span asp-validation-for="LitterId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="MyPuppies">Back to My Puppies</a>
+</div>
+

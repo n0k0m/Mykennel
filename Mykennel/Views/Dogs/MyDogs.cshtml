@@ -1,0 +1,83 @@
+﻿@model IEnumerable<Mykennel.Models.Dog>
+
+@{
+    ViewData["Title"] = "My dogs";
+}
+
+<h1>Manage my dogs</h1>
+
+<p>
+    <a asp-action="Create">Add new dog</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RegNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Born)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sex)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DogImage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Father)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mother)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RegNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Born)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Sex)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @if (item.DogImage != null)
+                    {
+                        <div>
+                            <img src="@item.DogImage" width="100%" />
+                        </div>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Father.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Mother.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.DogId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.DogId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.DogId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

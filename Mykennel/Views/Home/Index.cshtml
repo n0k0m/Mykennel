@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="rounded bg-mycolor">
+    <div class="row">
+        <div class="p-5 col-md-6">
+            <h1 class="text-light font-weight-bolder" style="font-size:50px">Welcome!</h1>
+            <hr />
+            <p class="lead text-light my-3">We are dedicated to provide the best user experience for registered breeders and soon to be dog owners alike.</p>
+        </div>
+        <div class="col-md-6">
+            <img class="img-fluid" src="~/images/header_dog_right.jpg" style="height:100%;" alt="header image" />
+        </div>
+    </div>
+</div>
+
+<div class="row m-3">
+    <div class="col-sm-6 col-md-5 col-xl-3 text-center d-none d-sm-none d-sm-block">
+        <img class="img-fluid rounded box-shadow" src="/images/visitor_image.jpg" alt="Card image cap">
+    </div>
+    <div class="col-sm-6 col-md-7 col-xl-9 py-3 box-shadow bg-dark text-light rounded">
+        <strong>For breeders</strong>
+        <h3>
+            <a class="text-light">Looking for a dog?</a>
+        </h3>
+        <p>
+            Are you tired of constantly searching the web to find websites? Take a look at our catalogue of breeders from all over Europe!
+            You can filter by searcing for breeds and countries. And if you aren't a professional, who want to take his dog to shows you can browse the hobby category.
+        </p>
+        <p><strong>Start searching now!</strong></p>
+        <div class="col-xl-4 row text-center">
+            <div class="col-6">
+                <a asp-controller="Kennels" asp-action="Index" class="btn btn-outline-light">Kennels</a>
+            </div>
+            <div class="col-6">
+                <a asp-controller="Kennels" asp-action="Index" class="btn btn-outline-light">Litters</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row m-3">
+    <div class="col-sm-6 col-md-7 col-xl-9 py-3 box-shadow bg-mycolor text-light rounded">
+        <strong>For breeders</strong>
+        <h3>
+            <a class="text-light">Register your kennel!</a>
+        </h3>
+        <p>
+            Register free to keep a catalogue of your dogs and litters. Reach your customers with our fantastic search engine. It is the
+            most user friendly way on the web to own your kennel page. Upload dogs, set ancestry, update kennels, add puppies. It is that easy.
+        </p>
+        <p><strong>It only takes 5 minutes.</strong></p>
+        <div>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light">Register</a>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-5 col-xl-3 text-center d-none d-sm-none d-sm-block">
+        <img class="img-fluid rounded box-shadow" src="/images/breeder_image.jpg" alt="Card image cap">
+    </div>
+</div>

@@ -1,0 +1,163 @@
+﻿@model Mykennel.Models.Litter
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="jumbotron text-center bg-white">
+    <div class="container">
+        <h1 class="jumbotron-heading" style="font-size:200px;">@Model.Name</h1>
+        <h4>@ViewBag.Breed.Name (@ViewBag.Breed.OriginalName)</h4>
+        <h2>Litter</h2>
+        <div class="container py-3">
+            <h5 class="my-2">from:</h5>
+            <a asp-controller="Kennels" asp-action="Details" asp-route-id="@Model.Kennel.URLName" class="btn btn-outline-dark"><h5>@Model.Kennel.KennelName</h5></a>
+        </div>
+        <div class="container py-3">
+            <h2>Date: @Model.Date.Year. @Model.Date.Month. @Model.Date.Day.</h2>
+            @{if (Model.Puppies != null)
+                {
+                    <p class="lead text-muted">We had @Model.Puppies.Count puppies in the litter!</p>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<div class="container text-center">
+    <h3>Parents:</h3>
+</div>
+<div class="container py-3">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="text-center"><h3>Father</h3></div>
+            <div class="card m-3">
+                <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Father.DogId">
+                    @{ if (Model.Father.DogImage != null)
+                        {<img src="@Model.Father.DogImage" class="card-img-top" alt="@Model.Father.Name">}
+                        else
+                        {<img src="/images/no-image.jpg" class="card-img-top" alt="">}
+                    }
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @Model.Father.Name {<i class="bi bi-gender-male"></i>}
+                    </h5>
+                    <p class="card-text"><strong>@Model.Father.TitlesGenetics</strong></p>
+                    <p class="card-text">@Model.Father.Description</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Father.DogId" class="btn btn-outline-dark">More</a>
+                        </div>
+                        <div class="col-6 text-right">
+                            @{ if ((int)Model.Father.Status == 1 || (int)Model.Father.Status == 2)
+                                {<a asp-controller="Kennels" asp-action="Details" asp-route-id="@Model.Kennel.URLName" class="btn btn-outline-dark">From: @Model.Kennel.KennelName</a>}
+                            else
+                            {<p>From another kennel</p>}
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="text-center"><h3>Mother</h3></div>
+            <div class="card m-3">
+                <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Mother.DogId">
+                    @{ if (Model.Mother.DogImage != null)
+                        {<img src="@Model.Mother.DogImage" class="card-img-top" alt="@Model.Mother.Name">}
+                        else
+                        {<img src="/images/no-image.jpg" class="card-img-top" alt="">}
+                    }
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @Model.Mother.Name {<i class="bi bi-gender-male"></i>}
+                    </h5>
+                    <p class="card-text"><strong>@Model.Mother.TitlesGenetics</strong></p>
+                    <p class="card-text">@Model.Mother.Description</p>
+                    <div class="row">
+                        <div class="col-6">
+                            <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Mother.DogId" class="btn btn-outline-dark">More</a>
+                        </div>
+                        <div class="col-6 text-right">
+                            @{ if ((int)Model.Mother.Status == 1 || (int)Model.Mother.Status == 2)
+                                {<a asp-controller="Kennels" asp-action="Details" asp-route-id="@Model.Kennel.URLName" class="btn btn-outline-dark">From: @Model.Kennel.KennelName</a>}
+                            else
+                            {<p>From another kennel</p>}
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container py-3 text-center">
+    <h3>Puppies:</h3>
+</div>
+<div class="container py-3">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Puppies.FirstOrDefault().Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Puppies.FirstOrDefault().Sex)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Puppies.FirstOrDefault().Bookable)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Puppies.FirstOrDefault().Aim)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Puppies.FirstOrDefault().Description)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Puppies)
+            {
+                <tr>
+                    <td>
+                        @{if (item.DogId != null)
+                            {<a asp-controller="Dogs" asp-action="Details" asp-route-id="@item.DogId">@Html.DisplayFor(modelItem => item.Name)</a>}
+                        else
+                        {@Html.DisplayFor(modelItem => item.Name)}
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Sex)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Bookable)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Aim)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-4 text-center">
+            @{ if (Model.Kennel.Logo != null)
+                {<div class="m-3">
+                        <a asp-controller="Kennels" asp-action="Details" asp-route-id="@Model.Kennel.URLName"><img src="@Model.Kennel.Logo" class="img-fluid" style="max-height:150px;" alt="@Model.Kennel.KennelName logo"></a>
+                    </div>}
+            }
+            <a asp-controller="Kennels" asp-action="Details" asp-route-id="@Model.Kennel.URLName" class="btn btn-dark">Back to @Model.Kennel.KennelName</a>
+        </div>
+    </div>
+</div>

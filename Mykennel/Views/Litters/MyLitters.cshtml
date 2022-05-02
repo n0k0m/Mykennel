@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Mykennel.Models.Litter>
+
+@{
+    ViewData["Title"] = "My litters";
+}
+
+<h1>Manage my litters</h1>
+
+<p>
+    <a asp-action="Create">Add new litter</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Kennel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Father)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mother)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Kennel.KennelName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Father.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mother.Name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.LitterId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.LitterId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.LitterId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

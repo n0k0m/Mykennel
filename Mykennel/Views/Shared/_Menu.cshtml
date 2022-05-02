@@ -1,0 +1,75 @@
+﻿@using Mykennel.Utility
+
+<header>
+    <nav class="navbar navbar-expand-md navbar-toggleable-md navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Mykennel</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+
+                    <!-- Lekérdezi milyen area-ban vagyunk, majd szerepkör szerint jelenít meg menüpontokat-->
+                    @if (ViewContext.RouteData.Values["area"] == null)
+                    {
+                        @if (ViewContext.RouteData.Values["action"].ToString() != "Details")
+                        {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Kennels" asp-action="Index">Kennels</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Litters" asp-action="Index">Litters</a>
+                        </li>
+                        }
+
+                        @if (User.IsInRole(SD.Role_Admin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole(SD.Role_User_Breeder))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    My kennel
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Kennels" asp-action="Settings">Kennel settings</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Dogs" asp-action="MyDogs">My dogs</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Litters" asp-action="MyLitters">My litters</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Puppies" asp-action="MyPuppies">My puppies</a>
+                                </div>
+                            </li>
+                        }
+                    }
+
+                    @if (ViewContext.RouteData.Values["area"] == "Admin")
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Content Management
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Breeds" asp-action="Index">Breeds</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Countries" asp-action="Index">Countries</a>
+                            </div>
+                        </li>
+                    }
+
+                </ul>
+                <partial name="_LoginPartial" />
+            </div>
+        </div>
+    </nav>
+</header>
