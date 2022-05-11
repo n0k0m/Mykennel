@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Mykennel.Models.Kennel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>View Kennels</h1>
+
+<table class="table table-responsive-sm">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.KennelName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.URLName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ContactPerson)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Country)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.Email)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.KennelName)
+            </td>
+            <td>
+                <a asp-area="" asp-controller="Kennels" asp-action="Details" asp-route-id="@item.URLName"> @Html.DisplayFor(modelItem => item.URLName) </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ContactPerson)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Country.CountryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.Email)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.KennelId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.KennelId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

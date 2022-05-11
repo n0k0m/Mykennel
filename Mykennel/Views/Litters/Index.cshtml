@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Mykennel.Models.Litter>
+﻿@model PaginatedList<Mykennel.Models.ViewModels.LitterVM>
 
 @{
     ViewData["Title"] = "Index";
@@ -11,13 +11,13 @@
             <form id="searchKennelForm" asp-action="Index" method="get">
                 <div class="row form-group">
                     <div class="col-md-5">
-                        <label class="control-label">@Html.DisplayNameFor(model => model.Breed)</label>
+                        <label class="control-label">Breed</label>
                         <select id="SelectedBreed" name="breed" class="form-control" asp-items="ViewBag.BreedId">
                             <option selected value=""></option>
                         </select>
                     </div>
                     <div class="col-md-5">
-                        <label class="control-label">@Html.DisplayNameFor(model => model.Country)</label>
+                        <label class="control-label">Country</label>
                         <select id="SelectedCountry" name="country" class="form-control" asp-items="ViewBag.CountryId">
                             <option selected value=""></option>
                         </select>
@@ -42,14 +42,36 @@
 {
     <div class="container py-2">
         <h3 style="display: inline;">
-            <a asp-controller="Litters" asp-action="Details" asp-route-id="@item.LitterId">"@item.Name" litter</a> -
-            <a asp-controller="Kennels" asp-action="Details" asp-route-id="@item.KennelId">@item.Kennel.KennelName </a>
+            <a asp-controller="Litters" asp-action="Details" asp-route-id="@item.Litter.LitterId">"@item.Litter.Name" litter</a> -
+            <a asp-controller="Kennels" asp-action="Details" asp-route-id="@item.Litter.Kennel.URLName">@item.Litter.Kennel.KennelName </a>
         </h3>
         <p style="display: inline;"><strong>@item.Country.CountryName</strong></p>
-        <p>@Html.DisplayNameFor(model => model.Breed): @item.Breed.Name (@item.Breed.OriginalName)<br>
-          <br>
-           @Html.DisplayNameFor(model => model.Date): @item.Date.Year. @item.Date.Month. @item.Date.Day.</p>
+        <p>
+            Breed: @item.Breed.Name (@item.Breed.OriginalName)<br>
+            Date: @item.Litter.Date.Year. @item.Litter.Date.Month. @item.Litter.Date.Day.
+        </p>
         <hr />
     </div>
 }
 
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-breed="@ViewData["BreedFilter"]"
+   asp-route-country="@ViewData["CountryFilter"]"
+   asp-route-hobby="@ViewData["HobbyFilter"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-breed="@ViewData["BreedFilter"]"
+   asp-route-country="@ViewData["CountryFilter"]"
+   asp-route-hobby="@ViewData["HobbyFilter"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

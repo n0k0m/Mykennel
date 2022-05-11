@@ -13,19 +13,19 @@
                 <ul class="navbar-nav flex-grow-1">
 
                     <!-- Lekérdezi milyen area-ban vagyunk, majd szerepkör szerint jelenít meg menüpontokat-->
-                    @if (ViewContext.RouteData.Values["area"] == null)
+                    @if (ViewContext?.ActionDescriptor?.RouteValues["area"] == null)
                     {
                         @if (ViewContext.RouteData.Values["action"].ToString() != "Details")
                         {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Kennels" asp-action="Index">Kennels</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Litters" asp-action="Index">Litters</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Kennels" asp-action="Index">Kennels</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Litters" asp-action="Index">Litters</a>
+                            </li>
                         }
 
                         @if (User.IsInRole(SD.Role_Admin))
@@ -51,7 +51,7 @@
                         }
                     }
 
-                    @if (ViewContext.RouteData.Values["area"] == "Admin")
+                    @if (ViewContext?.ActionDescriptor?.RouteValues["area"] != null && ViewContext?.ActionDescriptor?.RouteValues["area"].ToString() == "Admin")
                     {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Home</a>
@@ -61,10 +61,22 @@
                                 Content Management
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Kennels" asp-action="Index">Kennels</a>
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Breeds" asp-action="Index">Breeds</a>
                                 <a class="dropdown-item" asp-area="Admin" asp-controller="Countries" asp-action="Index">Countries</a>
                             </div>
                         </li>
+                        <li class="nav-item">
+                            <a class="btn btn-danger" asp-area="Admin" asp-controller="Tester" asp-action="Index">Tester</a>
+                        </li>
+                    }
+
+                    @if (ViewBag.FindAdmin == false) {
+                <li class="nav-item">
+                    <a class="btn btn-danger" asp-action="CreateAdmin">Create Admin</a>
+                </li>
                     }
 
                 </ul>

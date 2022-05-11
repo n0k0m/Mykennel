@@ -8,9 +8,13 @@ namespace Mykennel.Models.ViewModels
 {
     public class LitterVM
     {
-        [Display(Name = "Bookable Litters")]
-        public IQueryable<Litter> AvailableLitters { get; set; }
-        [Display(Name = "Planned Litters")]
-        public IQueryable<Litter> PlannedLitters { get; set; }
+        public Litter Litter { get; set; }
+        public Kennel Kennel { get; set; }
+        public ApplicationUser User { get; set; }
+
+        [Display(Name = "Breed")]
+        public Breed Breed { get; set; }
+        [Display(Name = "Country")]
+        public Country Country { get; set; }
     }
 }

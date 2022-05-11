@@ -6,7 +6,7 @@
 
 <section class="jumbotron text-center bg-white">
     <div class="container">
-        <h1 class="jumbotron-heading" style="font-size:200px;">@Model.Name</h1>
+        <h1 class="jumbotron-heading litter-title">@Model.Name</h1>
         <h4>@ViewBag.Breed.Name (@ViewBag.Breed.OriginalName)</h4>
         <h2>Litter</h2>
         <div class="container py-3">
@@ -28,20 +28,20 @@
     <h3>Parents:</h3>
 </div>
 <div class="container py-3">
-    <div class="row">
-        <div class="col-sm-6">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-l-5 col-xl-4 p-3">
             <div class="text-center"><h3>Father</h3></div>
             <div class="card m-3">
                 <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Father.DogId">
                     @{ if (Model.Father.DogImage != null)
-                        {<img src="@Model.Father.DogImage" class="card-img-top" alt="@Model.Father.Name">}
+                        {<img src="@Model.Father.DogImage" class="card-img-top img-cover" style="height:300px" alt="@Model.Father.Name">}
                         else
-                        {<img src="/images/no-image.jpg" class="card-img-top" alt="">}
+                        {<img src="/images/no-image.jpg" class="card-img-top img-cover" style="height:300px" alt="">}
                     }
                 </a>
                 <div class="card-body">
                     <h5 class="card-title">
-                        @Model.Father.Name {<i class="bi bi-gender-male"></i>}
+                        <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Father.DogId"> @Model.Father.Name </a> <i class="bi bi-gender-male"></i>
                     </h5>
                     <p class="card-text"><strong>@Model.Father.TitlesGenetics</strong></p>
                     <p class="card-text">@Model.Father.Description</p>
@@ -61,20 +61,20 @@
             </div>
         </div>
 
-        <div class="col-sm-6">
+        <div class="col-md-6 col-l-5 col-xl-4 p-3">
             <div class="text-center"><h3>Mother</h3></div>
             <div class="card m-3">
                 <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Mother.DogId">
                     @{ if (Model.Mother.DogImage != null)
-                        {<img src="@Model.Mother.DogImage" class="card-img-top" alt="@Model.Mother.Name">}
+                        {<img src="@Model.Mother.DogImage" class="card-img-top img-cover" style="height:300px" alt="@Model.Mother.Name">}
                         else
-                        {<img src="/images/no-image.jpg" class="card-img-top" alt="">}
+                        {<img src="/images/no-image.jpg" class="card-img-top img-cover" style="height:300px" alt="">}
                     }
                 </a>
                 <div class="card-body">
                     <h5 class="card-title">
-                        @Model.Mother.Name {<i class="bi bi-gender-male"></i>}
-                    </h5>
+                        <a asp-controller="Dogs" asp-action="Details" asp-route-id="@Model.Mother.DogId"> @Model.Mother.Name </a> <i class="bi bi-gender-female"></i>
+</h5>
                     <p class="card-text"><strong>@Model.Mother.TitlesGenetics</strong></p>
                     <p class="card-text">@Model.Mother.Description</p>
                     <div class="row">
@@ -100,7 +100,7 @@
     <h3>Puppies:</h3>
 </div>
 <div class="container py-3">
-    <table class="table">
+    <table class="table table-responsive-sm">
         <thead>
             <tr>
                 <th>

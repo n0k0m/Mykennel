@@ -16,6 +16,10 @@
                 <label asp-for="BreedId" class="control-label"></label>
                 <input asp-for="BreedId" class="form-control" />
                 <span asp-validation-for="BreedId" class="text-danger"></span>
+                @if(TempData["BreedError"] != null)
+            {
+                <p class="text-danger">@TempData["BreedError"]</p>
+            }
             </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>

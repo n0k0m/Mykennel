@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
@@ -37,6 +38,14 @@ namespace Mykennel
             // Role-ok használatához szükség van a rolemanager-re, így át kell írni a következő sort:
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme,
+            options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.LogoutPath = "/Identity/Account/Logout";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSingleton<IEmailSender, EmailSender>();
@@ -59,6 +68,9 @@ namespace Mykennel
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            // Status kódú hibaoldalak kezelése
+            app.UseStatusCodePagesWithReExecute("/Home/Oops/{0}");
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -67,21 +79,22 @@ namespace Mykennel
             // Area-k használatához szükséges "mintázat", de meghagyom a főoldalnak az alapbeállítást, hogy rövidebb url-eket kapjunk
             app.UseEndpoints(endpoints =>
             {
+                /*
                 endpoints.MapAreaControllerRoute(
                     name: "Admin",
                     areaName: "Admin",
-                    pattern: "Admin/{controller=Home}/{action=Index}"
+                    pattern: "Admin/{controller=Home}/{action=Index}/{id?}"
                 );
+                */
 
                 endpoints.MapControllerRoute(
                     name: "areaRoute",
-                    pattern: "{area:exists}/{controller}/{action}"
+                    pattern: "{area:exists}/{controller}/{action}/{id?}"
                 );
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}"
-                );
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 
                 endpoints.MapRazorPages();
             });

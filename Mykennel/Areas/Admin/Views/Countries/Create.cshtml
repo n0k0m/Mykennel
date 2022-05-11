@@ -16,6 +16,10 @@
                 <label asp-for="CountryId" class="control-label"></label>
                 <input asp-for="CountryId" class="form-control" />
                 <span asp-validation-for="CountryId" class="text-danger"></span>
+                @if (TempData["CountryError"] != null)
+                {
+                    <p class="text-danger">@TempData["CountryError"]</p>
+                }
             </div>
             <div class="form-group">
                 <label asp-for="CountryName" class="control-label"></label>

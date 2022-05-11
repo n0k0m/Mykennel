@@ -25,8 +25,21 @@ namespace Mykennel.Controllers
         // GET: Puppies/MyPuppies
         public IActionResult MyPuppies()
         {
-            var userPuppies = GetUserPuppies();
+            var userKennel = GetUserKennel();
 
+            if (userKennel == null)
+            {
+                TempData["ErrorMessage"] = "You need to create a kennel first!";
+                return RedirectToAction("Settings", "Kennels");
+            }
+
+            if (_context.Litters.Where(m => m.KennelId == userKennel.KennelId).Count() < 1)
+            {
+                TempData["ErrorMessage"] = "You need to have at least 1 litter to add puppies!";
+                return RedirectToAction("MyLitters", "Litters");
+            }
+
+            var userPuppies = GetUserPuppies();
             return View(userPuppies);
         }
 
@@ -48,9 +61,17 @@ namespace Mykennel.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(puppy);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(MyPuppies));
+                try
+                {
+                    _context.Add(puppy);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(MyPuppies));
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "You need to have a litter before you can add puppies!";
+                    return RedirectToAction(nameof(Create));
+                }
             }
             int userKennelId = GetUserKennel().KennelId;
             ViewData["DogId"] = new SelectList(_context.Dogs.Where(m => m.KennelId == userKennelId), "DogId", "Name", puppy.DogId);

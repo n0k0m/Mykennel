@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Error" + @ViewData["ErrorCode"];
+}
+
+<div class="row h-100">
+    <div class="text-center mx-auto">
+        <h1 class="errorcode">
+            <span>@ViewData["ErrorCode"].ToString()[0]</span>
+            <span class="mycolor">@ViewData["ErrorCode"].ToString()[1]</span>
+            <span>@ViewData["ErrorCode"].ToString()[2]</span>
+        </h1>
+        @if (ViewData["ErrorCode"].Equals("404"))
+        {
+            <h2 class="errorcodetext">Oops! Page not found.</h2>
+        }
+        else
+        {
+            <h2 class="errorcodetext">Oops! Something went wrong.</h2>
+        }
+    </div>
+</div>

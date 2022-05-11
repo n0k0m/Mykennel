@@ -29,11 +29,12 @@ namespace Mykennel.Controllers
 
         // Ez lesz a kennelek kereshető oldala
         // GET: Kennels
-        public async Task<IActionResult> Index(string breed, string country)
-        {
+        public async Task<IActionResult> Index(string breed, string country, int? pageNumber)
+        {  
             var kennels = _context.Kennels;
 
-            foreach (Kennel kennel in kennels)
+            // Feltölöm a fajtalistát az adott kennelhez
+            await foreach (Kennel kennel in kennels)
             {
                 var breeds = (from d in _context.Dogs
                  where d.KennelId.Equals(kennel.KennelId)
@@ -41,43 +42,75 @@ namespace Mykennel.Controllers
                 kennel.Breeds = breeds;
             }
 
+            // Lenyíló listához az adatokat átadom a nézetnek, illetve ha már volt kiválasztva adat, akkor azt is visszaadom
             ViewData["BreedId"] = new SelectList(_context.Breeds, "BreedId", "Name");
             ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName");
 
+            if (!String.IsNullOrEmpty(breed))
+            {
+                ViewData["BreedFilter"] = breed;
+            }
+            
+            if (!String.IsNullOrEmpty(country))
+            {
+                ViewData["CountryFilter"] = country;
+            }
+
+            // Hány elem jelenjen meg egy oldalon
+            int pageSize = 5;
+
+            // Szűrők
             if (!String.IsNullOrEmpty(breed) && !String.IsNullOrEmpty(country))
             {
-                return View(await (from k in kennels
-                                   join c in _context.Countries on k.CountryId equals c.CountryId
-                                   join d in _context.Dogs on k.KennelId equals d.KennelId
-                                   join b in _context.Breeds on d.BreedId equals b.BreedId
-                                   where b.BreedId.Equals(int.Parse(breed)) && c.CountryId.Equals(int.Parse(country))
-                                   select k).Distinct().ToListAsync());
+                return View(await PaginatedList<Kennel>.CreateAsync(
+                            ((from k in kennels
+                            join u in _context.ApplicationUsers on k.ApplicationUserId equals u.Id
+                            join c in _context.Countries on k.CountryId equals c.CountryId
+                            join d in _context.Dogs on k.KennelId equals d.KennelId
+                            join b in _context.Breeds on d.BreedId equals b.BreedId
+                            where b.BreedId.Equals(int.Parse(breed)) && c.CountryId.Equals(int.Parse(country)) && (u.LockoutEnd < DateTime.Now || u.LockoutEnd == null)
+                            orderby k.KennelName
+                            select k).Distinct())
+                    , pageNumber ?? 1, pageSize));
             }
             else if (!String.IsNullOrEmpty(breed))
             {
-                return View(await (from k in kennels
-                                   join c in _context.Countries on k.CountryId equals c.CountryId
-                                   join d in _context.Dogs on k.KennelId equals d.KennelId
-                                   join b in _context.Breeds on d.BreedId equals b.BreedId
-                                   where b.BreedId.Equals(int.Parse(breed))
-                                   select k).Distinct().ToListAsync());
+                return View(await PaginatedList<Kennel>.CreateAsync(
+                   ((from k in kennels
+                           join u in _context.ApplicationUsers on k.ApplicationUserId equals u.Id
+                           join c in _context.Countries on k.CountryId equals c.CountryId
+                           join d in _context.Dogs on k.KennelId equals d.KennelId
+                           join b in _context.Breeds on d.BreedId equals b.BreedId
+                           where b.BreedId.Equals(int.Parse(breed)) && (u.LockoutEnd < DateTime.Now || u.LockoutEnd == null)
+                           orderby k.KennelName
+                           select k).Distinct())
+                    , pageNumber ?? 1, pageSize));
             }
             else if (!String.IsNullOrEmpty(country))
             {
-                return View(await (from k in kennels
-                                   join c in _context.Countries on k.CountryId equals c.CountryId
-                                   join d in _context.Dogs on k.KennelId equals d.KennelId
-                                   join b in _context.Breeds on d.BreedId equals b.BreedId
-                                   where c.CountryId.Equals(int.Parse(country))
-                                   select k).Distinct().ToListAsync());
+                return View(await PaginatedList<Kennel>.CreateAsync(
+                    ((from k in kennels
+                            join u in _context.ApplicationUsers on k.ApplicationUserId equals u.Id
+                            join c in _context.Countries on k.CountryId equals c.CountryId
+                            join d in _context.Dogs on k.KennelId equals d.KennelId
+                            join b in _context.Breeds on d.BreedId equals b.BreedId
+                            where c.CountryId.Equals(int.Parse(country)) && (u.LockoutEnd < DateTime.Now || u.LockoutEnd == null)
+                            orderby k.KennelName
+                            select k).Distinct())
+                    , pageNumber ?? 1, pageSize));
             }
             else
             {
-                return View(await (from k in _context.Kennels
-                                   join c in _context.Countries on k.CountryId equals c.CountryId
-                                   join d in _context.Dogs on k.KennelId equals d.KennelId
-                                   join b in _context.Breeds on d.BreedId equals b.BreedId
-                                   select k).Distinct().ToListAsync());
+                return View(await PaginatedList<Kennel>.CreateAsync(
+                    ((from k in kennels
+                            join u in _context.ApplicationUsers on k.ApplicationUserId equals u.Id
+                            join c in _context.Countries on k.CountryId equals c.CountryId
+                            join d in _context.Dogs on k.KennelId equals d.KennelId
+                            join b in _context.Breeds on d.BreedId equals b.BreedId
+                            where u.LockoutEnd < DateTime.Now || u.LockoutEnd == null
+                            orderby k.KennelName
+                            select k).Distinct())
+                    , pageNumber ?? 1, pageSize));
             }
         }
 
@@ -96,7 +129,8 @@ namespace Mykennel.Controllers
                 .Include(k => k.Country)
                 .Include(k => k.Dogs)
                 .Include(k => k.Litters)
-                .FirstOrDefaultAsync(m => m.URLName == slug);
+                .Where(k => k.ApplicationUser.LockoutEnd < DateTime.Now || k.ApplicationUser.LockoutEnd == null)
+                .FirstOrDefaultAsync(m => m.URLName == slug.ToLower());
 
             if (kennel == null)
             {
@@ -130,7 +164,7 @@ namespace Mykennel.Controllers
         [Authorize(Roles = SD.Role_User_Breeder)]
         public IActionResult Create()
         {
-            // Egyelőre csak egyetlen kennelt szeretnénk hogy egy felhasználó létre tudjon hozni
+            // Egyelőre csak egyetlen kennelt szeretnék hogy egy felhasználó létre tudjon hozni
             if(GetUserKennel() == null)
             {
                 ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName");
@@ -149,16 +183,30 @@ namespace Mykennel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("KennelId,KennelName,URLName,City,PostalCode,Address,ShortDescription,Description,Logo,ContactPerson,CountryId")] Kennel kennel)
         {
+            if ((from k in _context.Kennels where k.URLName == kennel.URLName select k).FirstOrDefault() != null)
+            {
+                TempData["URLError"] = "URL name is taken, please choose another one!";
+                ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName", kennel.CountryId);
+                return View(kennel);
+            }
+
             if (ModelState.IsValid)
             {
                 // Automatikusan az éppen aktuális felhasználóhoz kötjük
                 kennel.ApplicationUserId = GetUserId();
 
+                _context.Add(kennel);
+                await _context.SaveChangesAsync();
+
                 string webRootPath = _hostEnvironment.WebRootPath;
                 var file = HttpContext.Request.Form.Files;
-                // Ha lett kép kiválasztva, akkor csinálni kell valamit
+
+                // Ha lett kép kiválasztva: újra le kell kérdezni, hogy meglegyen a kennelId
+                // újra le kell menteni az elérési utat
                 if (file.Count > 0)
                 {
+                    kennel = (from k in _context.Kennels where k.ApplicationUserId == GetUserId() select k).FirstOrDefault();
+
                     string fileName = "logo" + "_" + Guid.NewGuid().ToString();
                     string kennelFolder = Path.Combine("kennels", kennel.KennelId.ToString());
                     string uploadFolder = Path.Combine(webRootPath, kennelFolder); //összerakjuk az útvonalat hogy hova mentse
@@ -174,10 +222,9 @@ namespace Mykennel.Controllers
                         file[0].CopyTo(fStream);
                     }
                     kennel.Logo = @"\" + Path.Combine(kennelFolder, fileName + extension);
+                    _context.Update(kennel);
+                    await _context.SaveChangesAsync();
                 }
-
-                _context.Add(kennel);
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Settings));
             }
             ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName", kennel.CountryId);
@@ -217,6 +264,14 @@ namespace Mykennel.Controllers
                 return NotFound();
             }
 
+            // Megvizsgálom, hogy az URL nevet regisztrálta e már valaki
+            if ((from k in _context.Kennels where k.URLName == kennel.URLName && k.KennelId != kennel.KennelId select k).FirstOrDefault() != null)
+            {
+                TempData["URLError"] = "URL name is taken, please choose another one!";
+                ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName", kennel.CountryId);
+                return View(kennel);
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -241,6 +296,7 @@ namespace Mykennel.Controllers
                             }
                         }
 
+                        // Ha nem nyitott még könyvtárat a kennelnek, akkor csinálni kell egyet
                         if (!Directory.Exists(uploadFolder))
                         {
                             Directory.CreateDirectory(uploadFolder);
@@ -305,8 +361,44 @@ namespace Mykennel.Controllers
             int? id = GetUserKennel().KennelId;
 
             var kennel = await _context.Kennels.FindAsync(id);
-            _context.Kennels.Remove(kennel);
-            await _context.SaveChangesAsync();
+
+            string webRootPath = _hostEnvironment.WebRootPath;
+            string kennelFolder = Path.Combine("kennels", kennel.KennelId.ToString());
+            string uploadFolder = Path.Combine(webRootPath, kennelFolder);
+
+            try
+            {
+                _context.Kennels.Remove(kennel);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Please remove all references before removing your kennel!";
+                return RedirectToAction(nameof(Delete), kennel);
+            }
+
+            // Ki kell törölni a fájlokat is
+            try
+            {
+                if (Directory.Exists(uploadFolder))
+                {
+                    DirectoryInfo di = new DirectoryInfo(uploadFolder);
+                    foreach (FileInfo file in di.EnumerateFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (DirectoryInfo dir in di.EnumerateDirectories())
+                    {
+                        dir.Delete(true);
+                    }
+                    Directory.Delete(uploadFolder);
+                }
+            }
+            catch (Exception)
+            {
+                return RedirectToAction(nameof(Settings));
+            }
+
             return RedirectToAction(nameof(Settings));
         }
 

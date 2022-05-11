@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Mykennel.Data;
 using Mykennel.Models;
+using Mykennel.Models.ViewModels;
 using Mykennel.Utility;
 
 namespace Mykennel.Controllers
@@ -24,55 +25,64 @@ namespace Mykennel.Controllers
 
         // Kereső oldal
         // GET: Litters
-        public async Task<IActionResult> Index(string breed, string country, string hobby)
+        public async Task<IActionResult> Index(string breed, string country, string hobby, int? pageNumber)
         {
-            List<Litter> litters = new List<Litter>();
-            if (!String.IsNullOrEmpty(hobby))
-            {
-                litters = (litters = (from l in _context.Litters
-                           join p in _context.Puppies on l.LitterId equals p.LitterId
-                           where p.Bookable && p.Aim == Aim.Hobby
-                           select l).Include(l => l.Kennel).Distinct().ToList());
-            } else
-            {
-                litters = (from l in _context.Litters
-                           join p in _context.Puppies on l.LitterId equals p.LitterId
-                           where p.Bookable 
-                           select l).Include(l => l.Kennel).Distinct().ToList();
-            }
-
-            foreach (Litter litter in litters)
-            {
-                litter.Breed = (from l in litters
-                                join d in _context.Dogs on l.MotherId equals d.DogId
-                                join b in _context.Breeds on d.BreedId equals b.BreedId
-                                where l.LitterId.Equals(litter.LitterId)
-                                select b).FirstOrDefault();
-                litter.Country = (from l in litters
-                                  join k in _context.Kennels on l.KennelId equals k.KennelId
-                                  join c in _context.Countries on k.CountryId equals c.CountryId
-                                  where l.LitterId.Equals(litter.LitterId)
-                                  select c).FirstOrDefault();
-            }
-
+            // Lenyíló listához az adatokat átadom a nézetnek, illetve ha már volt kiválasztva adat, akkor azt is visszaadom
             ViewData["BreedId"] = new SelectList(_context.Breeds, "BreedId", "Name");
             ViewData["CountryId"] = new SelectList(_context.Countries, "CountryId", "CountryName");
 
-            if (!String.IsNullOrEmpty(breed) && !String.IsNullOrEmpty(country))
+            if (!String.IsNullOrEmpty(breed)) ViewData["BreedFilter"] = breed;
+            if (!String.IsNullOrEmpty(country)) ViewData["CountryFilter"] = country;
+            if (!String.IsNullOrEmpty(hobby)) ViewData["HobbyFilter"] = hobby;
+
+            int pageSize = 5;
+            if (String.IsNullOrEmpty(hobby))
             {
-                return View(litters.Where(m => m.Breed.BreedId == int.Parse(breed) && m.Country.CountryId == int.Parse(country)).ToList());
-            }
-            else if (!String.IsNullOrEmpty(breed))
+                var littersVM = (from l in _context.Litters
+                                join k in _context.Kennels on l.KennelId equals k.KennelId
+                                join u in _context.ApplicationUsers on k.ApplicationUserId equals u.Id
+                                join p in _context.Puppies on l.LitterId equals p.LitterId
+                                where p.Bookable && (u.LockoutEnd < DateTime.Now || u.LockoutEnd == null)
+                                 select new LitterVM { Litter = l, Kennel = k, User = u, Breed = l.Mother.Breed, Country = l.Kennel.Country});
+
+                if (!String.IsNullOrEmpty(breed))
+                {
+                    littersVM = (from l in littersVM
+                                 where l.Breed.BreedId.Equals(int.Parse(breed))
+                                 select l);
+                }
+
+                if (!String.IsNullOrEmpty(country))
+                {
+                    littersVM = (from l in littersVM
+                                 where l.Country.CountryId.Equals(int.Parse(country))
+                                 select l);
+                }
+
+                return View(await PaginatedList<LitterVM>.CreateAsync(littersVM.Distinct().OrderByDescending(l => l.Litter.Date), pageNumber ?? 1, pageSize));
+            } else
             {
-                return View(litters.Where(m => m.Breed.BreedId == int.Parse(breed)).ToList());
-            }
-            else if (!String.IsNullOrEmpty(country))
-            {
-                return View(litters.Where(m => m.Country.CountryId == int.Parse(country)).ToList());
-            }
-            else
-            {
-                return View(litters.ToList());
+                var hobbyLittersVM = (from l in _context.Litters
+                                      join k in _context.Kennels on l.KennelId equals k.KennelId
+                                      join p in _context.Puppies on l.LitterId equals p.LitterId
+                                      where p.Bookable && p.Aim == Aim.Hobby
+                                      select new LitterVM { Litter = l, Kennel = k, Breed = l.Mother.Breed, Country = l.Kennel.Country });
+
+                if (!String.IsNullOrEmpty(breed))
+                {
+                    hobbyLittersVM = (from l in hobbyLittersVM
+                                      where l.Breed.BreedId.Equals(int.Parse(breed))
+                                      select l);
+                }
+
+                if (!String.IsNullOrEmpty(country))
+                {
+                    hobbyLittersVM = (from l in hobbyLittersVM
+                                 where l.Country.CountryId.Equals(int.Parse(country))
+                                 select l);
+                }
+
+                return View(await PaginatedList<LitterVM>.CreateAsync(hobbyLittersVM.Distinct().OrderByDescending(l => l.Litter.Date), pageNumber ?? 1, pageSize));
             }
         }
 
@@ -88,8 +98,10 @@ namespace Mykennel.Controllers
             var litter = await _context.Litters
                 .Include(l => l.Father)
                 .Include(l => l.Kennel)
+                .Include(l => l.Kennel.ApplicationUser)
                 .Include(l => l.Mother)
                 .Include(l => l.Puppies)
+                .Where(l => l.Kennel.ApplicationUser.LockoutEnd < DateTime.Now || l.Kennel.ApplicationUser.LockoutEnd == null)
                 .FirstOrDefaultAsync(m => m.LitterId == id);
             if (litter == null)
             {
@@ -107,8 +119,21 @@ namespace Mykennel.Controllers
         // GET: Litters/MyLitters
         public IActionResult MyLitters()
         {
-            var userLitters = GetUserLitters();
+            var userKennel = GetUserKennel();
 
+            if (userKennel == null)
+            {
+                TempData["ErrorMessage"] = "You need to create a kennel first!";
+                return RedirectToAction("Settings", "Kennels");
+            }
+
+            if (_context.Dogs.Where(m => m.KennelId == userKennel.KennelId).Count() < 2)
+            {
+                TempData["ErrorMessage"] = "You need to have at least 2 dogs to create a litter and add puppies!";
+                return RedirectToAction("MyDogs", "Dogs");
+            }
+
+            var userLitters = GetUserLitters();
             return View(userLitters);
         }
 
@@ -131,9 +156,17 @@ namespace Mykennel.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(litter);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(MyLitters));
+                try
+                {
+                    _context.Add(litter);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(MyLitters));
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "You need to add dogs before you can add a litter!";
+                    return RedirectToAction(nameof(Create));
+                }
             }
             int userKennelId = GetUserKennel().KennelId;
             ViewData["FatherId"] = new SelectList(_context.Dogs.Where(m => m.KennelId == userKennelId), "DogId", "Name", litter.FatherId);

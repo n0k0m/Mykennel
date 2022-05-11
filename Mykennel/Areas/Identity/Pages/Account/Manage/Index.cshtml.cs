@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Mykennel.Utility;
 
 namespace Mykennel.Areas.Identity.Pages.Account.Manage
 {
@@ -56,6 +57,11 @@ namespace Mykennel.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (User.IsInRole(SD.Role_Admin))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
             }
 
             await LoadAsync(user);

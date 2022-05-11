@@ -27,7 +27,7 @@
 
 <div class="container py-5 bg-dark text-light text-center rounded">
     <div class="row">
-        <div class="col-md-6 col-xl-4">
+        <div class="col-md-6 col-l-4">
             <h4>We are located at:</h4>
             <p>
                 @Html.DisplayNameFor(model => model.Country): <strong>@Model.Country.CountryName</strong><br>
@@ -36,7 +36,7 @@
                 @Html.DisplayNameFor(model => model.Address): <strong>@Model.Address</strong>
             </p>
         </div>
-        <div class="col-md-6 col-xl-4">
+        <div class="col-md-6 col-l-4">
             <h4>Contacts:</h4>
             @{ if (Model.ContactPerson != null)
                 { <span>@Html.DisplayNameFor(model => model.ContactPerson): <strong>@Model.ContactPerson</strong></span><br> }
@@ -48,7 +48,7 @@
         </div>
         @if (ViewBag.KennelBreeds != null)
         {
-            <div class="col-md-6 col-xl-4">
+            <div class="col-md-6">
                 <h4>Our Breeds:</h4>
                 <ul>
                     @foreach (Breed breed in ViewBag.KennelBreeds)
@@ -64,26 +64,28 @@
 @{
     if (Model.Dogs.Count() != 0)
     {
-        <div class="container py-5">
-            <h3>Our dogs:</h3>
-            <div class="row">
-                @foreach (Dog dog in Model.Dogs)
-                {
-                    if ((int)dog.Status == 1 || (int)dog.Status == 2)
+        <div class="container py-3">
+            <h3 class="py-3">Our dogs:</h3>
+            @foreach (Breed breed in ViewBag.KennelBreeds)
+            {
+                <h4>@breed.Name (@breed.OriginalName):</h4>
+                <div class="card-columns">
+                    @foreach (Dog dog in Model.Dogs.Where(d => d.Breed == breed))
                     {
-                        <div class="col-md-4 col-xl-3">
-                            <div class="card m-3">
+                        if ((int)dog.Status == 1 || (int)dog.Status == 2)
+                        {
+                            <div class="card">
                                 <a asp-controller="Dogs" asp-action="Details" asp-route-id="@dog.DogId">
                                     @{ if (dog.DogImage != null)
-                                        {<img src="@dog.DogImage" class="card-img-top cover-200" alt="@dog.Name image">}
+                                        {<img src="@dog.DogImage" class="card-img-top img-cover" style="height:200px" alt="@dog.Name image">}
                                         else
-                                        {<img src="/images/no-image.jpg" class="card-img-top cover-200" alt="">}
+                                        {<img src="/images/no-image.jpg" class="card-img-top img-cover" style="height:200px" alt="">}
                                     }
 
                                 </a>
                                 <div class="card-body">
                                     <h5 class="card-title">
-                                        @dog.Name
+                                        <a asp-controller="Dogs" asp-action="Details" asp-route-id="@dog.DogId"> @dog.Name </a>
                                         @{ if ((int)dog.Sex == 1)
                                             {<i class="bi bi-gender-male"></i>}
                                             else
@@ -101,10 +103,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     }
-                }
-            </div>
+                </div>
+                <hr />
+            }
         </div>
     }
 }
@@ -114,13 +117,17 @@
     {
         <div class="container py-5">
             <h3>Our Litters:</h3>
-            <div class="row">
-                @foreach (Litter litter in Model.Litters)
+            <div class="card-deck">
+                @foreach (Litter litter in Model.Litters.OrderBy(l => l.Date))
                 {
-                    <div class="col-sm-3 m-3">
-                        <a asp-controller="Litters" asp-action="Details" asp-route-id="@litter.LitterId" class="btn btn-dark">
+                    <div class="card">
+                        <a asp-controller="Litters" asp-action="Details" asp-route-id="@litter.LitterId" class="btn btn-dark litter-card">
                             <h1>@litter.Name</h1>
-                            <p>@litter.Date.Year. @litter.Date.Month. @litter.Date.Day.</p>
+                            <p>
+                                <strong>@litter.Mother.Breed.Name</strong><br>
+                                (@litter.Mother.Breed.Name)<br>
+                                @litter.Date.Year. @litter.Date.Month. @litter.Date.Day.
+                            </p>
                         </a>
                     </div>
                 }

@@ -42,15 +42,5 @@ namespace Mykennel.Models
         public virtual Dog Father { get; set; }
         [ForeignKey("MotherId")]
         public virtual Dog Mother { get; set; }
-
-        // Tárolni lehet az objektumban a fajtát és az országot a szűréshez.
-        [NotMapped]
-        public Breed Breed { get; set; }
-        [NotMapped]
-        public Country Country { get; set; }
-        [NotMapped]
-        public IQueryable<Puppy> Males { get; set; }
-        [NotMapped]
-        public IQueryable<Puppy> Females { get; set; }
     }
 }

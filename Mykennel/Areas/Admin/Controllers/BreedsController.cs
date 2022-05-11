@@ -54,12 +54,16 @@ namespace Mykennel.Areas.Admin.Controllers
         }
 
         // POST: Admin/Breeds/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BreedId,Name,OriginalName")] Breed breed)
         {
+            if ((from b in _context.Breeds where b.BreedId == breed.BreedId select b).FirstOrDefault() != null)
+            {
+                TempData["BreedError"] = "FCI number already registered!";
+                return View(breed);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(breed);
@@ -86,8 +90,6 @@ namespace Mykennel.Areas.Admin.Controllers
         }
 
         // POST: Admin/Breeds/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BreedId,Name,OriginalName")] Breed breed)
@@ -123,6 +125,18 @@ namespace Mykennel.Areas.Admin.Controllers
         // GET: Admin/Breeds/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            // Nem akarom, hogy törölni lehessen, ha már van regisztrálva kutya ehhez a fajtához.
+            var dogsInBreed = (from d in _context.Dogs
+                               join k in _context.Kennels on d.KennelId equals k.KennelId
+                                    where d.BreedId == id
+                                    select new { k.KennelName, d.Name }).ToList();
+
+            if (dogsInBreed.Any())
+            {
+                TempData["BreedError2"] = "Can't delete breed with dogs registered to it: " + String.Join(", ", dogsInBreed);
+                return RedirectToAction(nameof(Index));
+            }
+
             if (id == null)
             {
                 return NotFound();

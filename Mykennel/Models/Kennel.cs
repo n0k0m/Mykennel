@@ -24,7 +24,6 @@ namespace Mykennel.Models
        
         [Required]
         [MaxLength(20)]
-        [Remote(action: "VerifyURL", controller: "Kennels", ErrorMessage = "URL already taken!")]
         [RegularExpression(@"[a-z0-9]+", ErrorMessage = "Please enter a short name with lowercase letters and numbers only!")]
         [Display(Name = "URL friendly name")]
         public string URLName { get; set; } // Ha Id helyett SEO barát URL címet szeretnénk használni

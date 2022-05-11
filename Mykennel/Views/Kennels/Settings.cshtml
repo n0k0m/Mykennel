@@ -92,5 +92,11 @@
     else
     {
         <a asp-action="Create" class="btn btn-primary">Create New</a>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <p class="text-danger">
+                @TempData["ErrorMessage"]
+            </p>
+        }
     }
 }

@@ -4,14 +4,23 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Manage Breeds</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+@if (TempData["BreedError2"] != null)
+{
+    <p class="text-danger">@TempData["BreedError2"]</p>
+}
+
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BreedId)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -22,20 +31,24 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OriginalName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.BreedId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BreedId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BreedId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BreedId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OriginalName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.BreedId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.BreedId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.BreedId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

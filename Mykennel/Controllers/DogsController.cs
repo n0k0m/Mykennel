@@ -39,7 +39,9 @@ namespace Mykennel.Controllers
                 .Include(d => d.Breed)
                 .Include(d => d.Father)
                 .Include(d => d.Kennel)
+                .Include(d => d.Kennel.ApplicationUser)
                 .Include(d => d.Mother)
+                .Where(l => l.Kennel.ApplicationUser.LockoutEnd < DateTime.Now || l.Kennel.ApplicationUser.LockoutEnd == null)
                 .FirstOrDefaultAsync(m => m.DogId == id);
             if (dog == null)
             {
@@ -52,9 +54,14 @@ namespace Mykennel.Controllers
         // GET: Dogs/MyDogs
         public IActionResult MyDogs()
         {
-            var userDogs = GetUserDogs();
+            if (GetUserKennel() != null)
+            {
+                var userDogs = GetUserDogs();
 
-            return View(userDogs);
+                return View(userDogs);
+            }
+            TempData["ErrorMessage"] = "You need to create a kennel first!";
+            return RedirectToAction("Settings", "Kennels");
         }
 
         // GET: Dogs/Create
@@ -69,8 +76,6 @@ namespace Mykennel.Controllers
         }
 
         // POST: Dogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = SD.Role_User_Breeder)]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -138,8 +143,6 @@ namespace Mykennel.Controllers
         }
 
         // POST: Dogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = SD.Role_User_Breeder)]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -239,8 +242,29 @@ namespace Mykennel.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dog = await _context.Dogs.FindAsync(id);
-            _context.Dogs.Remove(dog);
-            await _context.SaveChangesAsync();
+            var dogImage = dog.DogImage;
+            
+            string webRootPath = _hostEnvironment.WebRootPath;
+            try
+            {
+                _context.Dogs.Remove(dog);
+                await _context.SaveChangesAsync();
+            } 
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "You can't delete this dog because it is referenced by another dog. Please remove the reference first!";
+                return RedirectToAction(nameof(Delete), dog);
+            }
+
+             if (dogImage != null)
+                {
+                    var imagePath = Path.Combine(webRootPath, dogImage.TrimStart('\\'));
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
             return RedirectToAction(nameof(MyDogs));
         }
 

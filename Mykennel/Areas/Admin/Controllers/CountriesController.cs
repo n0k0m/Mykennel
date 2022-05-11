@@ -54,12 +54,16 @@ namespace Mykennel.Areas.Admin.Controllers
         }
 
         // POST: Admin/Countries/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CountryId,CountryName")] Country country)
         {
+            if ((from c in _context.Countries where c.CountryId == country.CountryId select c).FirstOrDefault() != null)
+            {
+                TempData["CountryError"] = "ISO number already registered!";
+                return View(country);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(country);
@@ -86,8 +90,6 @@ namespace Mykennel.Areas.Admin.Controllers
         }
 
         // POST: Admin/Countries/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CountryId,CountryName")] Country country)
@@ -123,6 +125,17 @@ namespace Mykennel.Areas.Admin.Controllers
         // GET: Admin/Countries/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            // Nem akarom, hogy törölni lehessen, ha már van regisztrálva kennel ehhez az ország azonosítóhoz.
+            var kennelsInCountry = (from k in _context.Kennels
+                                    where k.CountryId == id
+                                    select new { k.KennelName }).ToList();
+
+            if (kennelsInCountry.Any())
+            {
+                TempData["CountryError2"] = "Can't delete country with kennels registered to it: " + String.Join(", ", kennelsInCountry);
+                return RedirectToAction(nameof(Index));
+            }
+            
             if (id == null)
             {
                 return NotFound();
@@ -143,6 +156,17 @@ namespace Mykennel.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Nem akarom, hogy törölni lehessen, ha már van regisztrálva kennel ehhez az ország azonosítóhoz.
+            var kennelsInCountry = (from k in _context.Kennels
+                                    where k.CountryId == id
+                                    select new { k.KennelName }).ToList();
+
+            if (kennelsInCountry.Any())
+            {
+                TempData["CountryError2"] = "Can't delete country with kennels registered to it: " + String.Join(", ", kennelsInCountry);
+                return RedirectToAction(nameof(Index));
+            }
+
             var country = await _context.Countries.FindAsync(id);
             _context.Countries.Remove(country);
             await _context.SaveChangesAsync();

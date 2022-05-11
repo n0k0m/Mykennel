@@ -21,11 +21,15 @@
                 <label asp-for="URLName" class="control-label"></label>
                 <input asp-for="URLName" class="form-control" />
                 <span asp-validation-for="URLName" class="text-danger"></span>
+                @if (TempData["URLError"] != null)
+                {
+                    <p class="text-danger">@TempData["URLError"]</p>
+                }
             </div>
 
             <div class="form-group">
                 <label asp-for="Logo" class="control-label"></label>
-                <input type="file" name="File" id="uploadBox" class="form-control" />
+                <input type="file" name="File" id="uploadBox" class="form-control"/>
             </div>
 
             <div class="form-group">

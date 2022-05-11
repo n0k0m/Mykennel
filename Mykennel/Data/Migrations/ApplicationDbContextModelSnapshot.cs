@@ -302,8 +302,8 @@ namespace Mykennel.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TitlesGenetics")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.HasKey("DogId");
 
@@ -407,8 +407,8 @@ namespace Mykennel.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("LitterId");
 

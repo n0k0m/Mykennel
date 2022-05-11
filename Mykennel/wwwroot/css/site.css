@@ -4,11 +4,19 @@ for details on configuring this project to bundle and minify static web assets. 
 /* Saját stílusaim
 -------------------------------------------------- */
 ul {
-    list-style-type: none;
+    list-style: none;
+    padding-left: 0;
 }
 
-/* Anchor tag styles
--------------------------------------------------- */
+a {
+    color: rgb(96,185,218);
+}
+
+a:hover {
+    text-decoration: none;
+    color: #1861ac;
+}
+
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -19,13 +27,22 @@ a.navbar-brand {
     background-color: rgb(96,185,218);
 }
 
-.img-cover {
-    object-fit: cover;
+.mycolor {
+    color: rgb(96,185,218);
 }
 
-/* Provide sufficient contrast against white background */
-a {
-    color: rgb(96,185,218);
+.img-cover {
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: center;
+    object-position: center;
+}
+
+.img-fit {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 50vh;
 }
 
 .btn-primary {
@@ -38,6 +55,89 @@ a {
     color: #fff;
     background-color: rgb(96,185,218);
     border-color: #1861ac;
+}
+
+/* Error oldalak
+-------------------------------------------------- */
+
+.errorcode {
+    text-shadow: -4px 0px 0px #fff;
+    font-size: 100px;
+    font-weight: 900;
+    margin: 0px;
+    color: #262626;
+    text-transform: uppercase;
+    letter-spacing: -20px;
+    margin-left: -10px;
+}
+
+.errorcodetext {
+    color: #262626;
+}
+
+@media (min-width: 576px) {
+    .errorcode {
+        text-shadow: -8px 0px 0px #fff;
+        font-size: 150px;
+        letter-spacing: -30px;
+        margin-left: -20px;
+    }
+}
+
+@media (min-width: 768px) {
+    .errorcode {
+        text-shadow: -12px 0px 0px #fff;
+        font-size: 220px;
+        letter-spacing: -40px;
+        margin-left: -30px;
+    }
+}
+
+@media (min-width: 992px) {
+    .errorcode {
+        text-shadow: -20px 0px 0px #fff;
+        font-size: 300px;
+        letter-spacing: -50px;
+        margin-left: -40px;
+    }
+}
+
+/* Alom cím
+-------------------------------------------------- */
+.litter-title {
+    font-size:100px
+}
+
+@media (min-width: 576px) {
+    .litter-title {
+        font-size: 200px;
+    }
+}
+
+/* Kártya oszlopok
+    -------------------------------------------------*/
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 1200px) {
+    .card-columns {
+        column-count: 4;
+    }
 }
 
 /* Sticky footer styles

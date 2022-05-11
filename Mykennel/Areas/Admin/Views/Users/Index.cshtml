@@ -1,0 +1,84 @@
+﻿@model IEnumerable<Mykennel.Models.ViewModels.UserVM>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Manage users</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplicationUser.Role)
+            </th>
+            <td>
+                Promote
+            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.Kennel.KennelName)
+            </th>
+            <td>
+                @Html.DisplayNameFor(model => model.Kennel.URLName)
+            </td>
+            <td>
+                Lock User
+            </td>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApplicationUser.Role)
+            </td>
+            <td>
+                <form asp-action="Promote">
+                    @if (item.ApplicationUser.Role != SD.Role_Admin && item.ApplicationUser.Role != SD.Role_User_Breeder)
+                    {
+                        <a><i class="bi bi-arrow-up-circle sendPost"></i> </a>
+                        <input type="hidden" name="id" value="@item.ApplicationUser.Id" />
+                    }
+                </form>
+            </td>
+            <td>
+                @if (item.Kennel != null)
+                {
+                    @Html.DisplayFor(modelItem => item.Kennel.KennelName)
+                }
+            </td>
+            <td>
+                @if (item.Kennel != null)
+                {
+                    <a asp-area="" asp-controller="Kennels" asp-action="Details" asp-route-id="@item.Kennel.URLName"> @Html.DisplayFor(modelItem => item.Kennel.URLName) </a>
+                }
+            </td>
+            <td>
+                <form method="post">
+                    @if (@item.ApplicationUser.Role != SD.Role_Admin) 
+                    { 
+                        @if (@item.ApplicationUser.LockoutEnd > DateTime.Now)
+                        {
+                            <a class="text-danger"><i class="bi bi-lock sendPost"></i> </a>
+                            <input type="hidden" name="id" value="@item.ApplicationUser.Id" />
+                        }
+                        else
+                        {
+                            <a><i class="bi bi-unlock sendPost"></i> </a>
+                            <input type="hidden" name="id" value="@item.ApplicationUser.Id" />
+                        }
+                    }
+                </form>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
